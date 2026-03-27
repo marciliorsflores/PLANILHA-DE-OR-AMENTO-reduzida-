@@ -1,2 +1,1 @@
-# PLANILHA-DE-OR-AMENTO-reduzida-
-PLANILHA DE ORÇAMENTO reduzida
+
