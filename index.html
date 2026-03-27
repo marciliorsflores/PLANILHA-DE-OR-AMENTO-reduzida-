@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planilha de Custos - MC Serigrafia</title>
+    <title>Planilha de Custos - Interativa e Automática</title>
     <style>
-        /* Reset de Estilos */
+        /* Estilos de Reinicialização */
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* Fundo do visualizador na tela */
         body {
             font-family: Arial, sans-serif;
             font-size: 11px;
             color: #000;
+            line-height: 1.2;
             background-color: #525659;
             display: flex;
             flex-direction: column;
@@ -19,41 +21,56 @@
             padding: 20px;
         }
 
-        /* Página A4 */
+        /* Simulando a Folha A4 de Papel (Desktop) */
         .page-a4 {
             width: 210mm;
             min-height: 297mm;
             background-color: #fff;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            padding: 10mm;
+            padding: 8mm;
             margin-bottom: 20px;
         }
 
+        /* Borda preta principal do formulário */
         .form-container {
             border: 2px solid #000;
             padding: 2px;
             height: 100%;
-            display: flex;
-            flex-direction: column;
         }
 
-        /* Utilitários */
+        /* Utilitários Gerais */
         .bold { font-weight: bold; }
         .uppercase { text-transform: uppercase; }
+        .small-subtext { font-size: 8px; font-weight: normal; text-transform: uppercase; margin-top: -3px; display: block; text-align: center; }
+        .flex { display: flex; }
+        .flex-col { display: flex; flex-direction: column; }
+        .flex-grow { flex-grow: 1; }
         .border-b { border-bottom: 1px solid #000; }
         .border-r { border-right: 1px solid #000; }
-        
-        input, textarea {
+
+        /* Estilos para os Campos Digitáveis (Inputs) */
+        input {
             font-family: inherit;
             font-size: inherit;
-            background: transparent;
+            color: #000;
+            background-color: transparent;
             border: none;
             outline: none;
-            font-weight: bold;
+        }
+        input:focus {
+            background-color: rgba(255, 255, 0, 0.2); 
         }
         
-        input:focus { background-color: rgba(255, 255, 0, 0.1); }
-        .input-line { border-bottom: 1px solid #000; text-align: center; }
+        .input-line {
+            border-bottom: 1px solid #000;
+            text-align: center;
+            font-weight: bold;
+        }
+        .input-text {
+            font-weight: bold;
+            padding-left: 5px;
+            width: 100%;
+        }
 
         /* Cabeçalho */
         .header-top { display: flex; border-bottom: 2px solid #000; }
@@ -61,171 +78,354 @@
         .header-title { font-size: 38px; font-weight: 800; letter-spacing: -1px; }
         .header-info { width: 30%; background-color: #dcdcdc; padding: 8px; font-weight: bold; display: flex; flex-direction: column; justify-content: center; }
         
-        .row-info { padding: 5px; border-bottom: 1px solid #000; font-weight: bold; }
-
-        /* Especificações */
-        .specs-row { display: flex; border-bottom: 1px solid #000; }
-        .specs-left { width: 60%; border-right: 1px solid #000; padding: 8px; }
-        .specs-right { width: 40%; padding: 8px; font-weight: bold; }
-        .spec-item { margin-bottom: 6px; display: flex; align-items: baseline; white-space: nowrap; font-weight: bold; }
+        .date-line { display: flex; align-items: center; margin-bottom: 4px; }
+        .vend-line { display: flex; align-items: center; }
         
-        .fmt-box { display: inline-flex; flex-direction: column; align-items: center; width: 50px; margin: 0 3px; }
-        .sub-label { font-size: 8px; text-transform: uppercase; font-weight: normal; margin-top: -2px; }
+        .client-vend-row { padding: 5px; display: flex; align-items: center; font-weight: bold; }
+        .desc-row { padding: 5px; display: flex; align-items: center; font-weight: bold; }
+
+        /* Seção de Especificações */
+        .specs-row { display: flex; border-bottom: 1px solid #000; }
+        .specs-left { width: 60%; border-right: 1px solid #000; padding: 10px; }
+        .specs-right { width: 40%; padding: 10px; display: flex; flex-direction: column; }
+        
+        .spec-item { margin-bottom: 8px; display: flex; align-items: baseline; flex-wrap: wrap; font-weight: bold; }
+        .spec-col-format { display: inline-flex; flex-direction: column; align-items: center; width: 60px; margin: 0 4px; }
 
         /* Tabelas */
-        .section-header { background-color: #333; color: #fff; font-weight: bold; padding: 3px 10px; margin-top: 5px; display: inline-block; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 2px; }
-        th, td { border: 1px solid #000; height: 18px; }
-        th { background-color: #f0f0f0; padding: 2px; }
-        td input { width: 100%; height: 100%; text-align: center; }
-        .col-desc { text-align: left; padding-left: 5px; width: 45%; }
+        .section-header {
+            background-color: #333; color: #fff; font-weight: bold; font-size: 11px;
+            padding: 3px 10px; display: inline-block; margin-top: 5px; margin-bottom: 2px; text-transform: uppercase;
+        }
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 5px; min-width: 600px; }
+        th, td { border: 1px solid #000; }
+        th { font-weight: bold; text-align: center; background-color: #f0f0f0; padding: 4px; }
+        
+        td { padding: 0; height: 19px; }
+        td input { width: 100%; height: 100%; padding: 3px; text-align: center; }
+        td.col-desc { text-align: left; padding-left: 8px; width: 45%; font-weight: bold;}
+        td.col-desc-input input { text-align: left; padding-left: 8px; font-weight: bold; }
+        .col-num { width: 13.75%; }
 
         /* Subtotais */
-        .sub-row { display: flex; justify-content: flex-end; align-items: center; margin: 2px 0 5px 0; font-weight: bold; }
-        .sub-box { border: 1px solid #000; width: 90px; height: 20px; margin-left: 20px; text-align: right; padding-right: 5px; background-color: #f9f9f9; }
+        .subtotal-container { display: flex; justify-content: flex-end; align-items: center; margin-top: 2px; margin-bottom: 8px; font-weight: bold; }
+        .subtotal-box-container { margin-left: 30px; }
+        .subtotal-box { border: 1px solid #000; width: 100px; height: 22px; text-align: right; padding-right: 5px; font-weight: bold; background-color: #f9f9f9; color: #000;}
+        .subtotal-box:focus { background-color: #f9f9f9; } 
 
-        /* Rodapé */
-        .footer-sec { display: flex; border-top: 1px solid #000; }
-        .footer-l { width: 45%; background-color: #dcdcdc; border-right: 1px solid #000; padding: 8px; }
-        .footer-r { width: 55%; padding: 8px; }
-        .price-line { display: flex; align-items: baseline; margin-bottom: 5px; white-space: nowrap; font-weight: bold; }
+        /* Rodapé - Condições e Venda */
+        .commercial-section { display: flex; border-top: 2px solid #000; font-size: 11px; }
+        .cond-left { width: 48%; padding: 10px; background-color: #dcdcdc; border-right: 1px solid #000; }
+        .cond-right { width: 52%; padding: 10px; }
+        .commercial-title { text-align: center; font-weight: bold; margin-bottom: 15px; font-size: 12px; }
+        
+        .cond-item { display: flex; margin-bottom: 10px; align-items: baseline; font-weight: bold;}
+        .cond-item span:first-child { width: 90px; }
+        
+        .price-line { display: flex; margin-bottom: 8px; align-items: baseline; flex-wrap: nowrap; font-weight: bold; white-space: nowrap; }
 
-        /* Botão */
-        .print-btn { background-color: #007bff; color: white; border: none; padding: 15px; width: 210mm; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 40px; }
+        /* Botão de Impressão */
+        .print-controls {
+            width: 100%; max-width: 210mm; display: flex; justify-content: center;
+            margin-top: 10px; margin-bottom: 30px;
+        }
+        .print-btn {
+            background-color: #007bff; color: white; border: none; padding: 15px 30px;
+            font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background-color 0.3s; width: 100%;
+        }
+        .print-btn:hover { background-color: #0056b3; }
 
-        /* Configurações de Impressão */
-        @page { size: A4; margin: 0; }
-        @media print {
-            body { background: white; padding: 0; }
-            .page-a4 { box-shadow: none; margin: 0; width: 210mm; height: 297mm; padding: 10mm; overflow: hidden; }
-            .print-btn { display: none; }
-            .header-info, .footer-l { -webkit-print-color-adjust: exact; background-color: #dcdcdc !important; }
-            .section-header { -webkit-print-color-adjust: exact; background-color: #333 !important; }
+        /* Responsividade Mobile */
+        @media screen and (max-width: 800px) {
+            body { padding: 10px; }
+            .page-a4 { width: 100%; min-height: auto; padding: 10px; box-shadow: none; }
+            .header-top, .specs-row, .commercial-section { flex-direction: column; }
+            .header-title-container, .header-info, .specs-left, .specs-right, .cond-left, .cond-right { width: 100%; border-right: none; }
+            .header-info { border-top: 2px solid #000; }
+            .specs-left { border-bottom: 1px solid #000; }
+            .cond-left { border-bottom: 2px solid #000; }
+            .header-title { font-size: 28px; }
+            .subtotal-container { flex-direction: column; align-items: flex-end; gap: 5px; }
+            .subtotal-box-container { margin-left: 0; }
         }
 
-        /* Responsividade Celular */
-        @media screen and (max-width: 800px) {
-            .page-a4 { width: 100%; min-height: auto; padding: 5px; }
-            .header-top, .specs-row, .footer-sec { flex-direction: column; }
-            .header-title-container, .header-info, .specs-left, .specs-right, .footer-l, .footer-r { width: 100%; border-right: none; }
-            .print-btn { width: 100%; }
+        /* Impressão A4 */
+        @page { size: A4; margin: 0; }
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            html, body { width: 210mm; height: 297mm; background-color: #fff; padding: 0; margin: 0; }
+            .page-a4 { width: 210mm; height: 297mm; padding: 10mm; box-shadow: none; margin: 0; border: none; overflow: hidden; }
+            .print-controls { display: none; }
+            input:focus { background-color: transparent; }
+            .header-top { flex-direction: row !important; }
+            .header-title-container { width: 70% !important; border-right: 1px solid #000 !important; }
+            .header-info { width: 30% !important; border-top: none !important; }
+            .specs-row { flex-direction: row !important; }
+            .specs-left { width: 60% !important; border-right: 1px solid #000 !important; border-bottom: none !important; }
+            .specs-right { width: 40% !important; }
+            .commercial-section { flex-direction: row !important; }
+            .cond-left { width: 48% !important; border-right: 1px solid #000 !important; border-bottom: none !important; }
+            .cond-right { width: 52% !important; }
+            .subtotal-container { flex-direction: row !important; align-items: center !important; }
+            .subtotal-box-container { margin-left: 30px !important; }
         }
     </style>
 </head>
 <body>
 
 <div class="page-a4">
-    <div class="form-container">
+    <div class="form-container flex-col">
+
         <div class="header-top">
             <div class="header-title-container border-r">
                 <span class="header-title uppercase">PLANILHA DE CUSTOS</span>
             </div>
             <div class="header-info">
-                <div class="uppercase">
+                <div class="date-line uppercase">
                     DATA 
-                    <input type="text" id="dia" class="input-line" style="width:22px" maxlength="2">/
-                    <input type="text" id="mes" class="input-line" style="width:22px" maxlength="2">/
-                    <input type="text" id="ano" class="input-line" style="width:35px" maxlength="4">
+                    <input type="text" class="input-line" id="data-dia" style="width: 25px; margin: 0 5px;" maxlength="2"> / 
+                    <input type="text" class="input-line" id="data-mes" style="width: 25px; margin: 0 5px;" maxlength="2"> / 
+                    <input type="text" class="input-line" id="data-ano" style="width: 35px; margin: 0 5px;" maxlength="4">
                 </div>
-                <div style="margin-top:5px">VEND: <input type="text" style="width:70%"></div>
+                <div class="vend-line uppercase">
+                    VEND: <input type="text" class="input-text">
+                </div>
             </div>
         </div>
 
-        <div class="row-info uppercase">CLIENTE: <input type="text" style="width:85%"></div>
-        <div class="row-info uppercase">DESCRIÇÃO: <input type="text" style="width:85%"></div>
+        <div class="flex border-b client-vend-row uppercase">
+            CLIENTE : <input type="text" class="input-text flex-grow">
+        </div>
+
+        <div class="flex border-b desc-row uppercase">
+            DESCRIÇÃO : <input type="text" class="input-text flex-grow">
+        </div>
 
         <div class="specs-row">
             <div class="specs-left">
                 <div class="spec-item uppercase">
-                    FORMATO FINAL: 
-                    <div class="fmt-box"><input type="text" class="input-line"><span class="sub-label">Alt</span></div> X
-                    <div class="fmt-box"><input type="text" class="input-line"><span class="sub-label">Larg</span></div> X
-                    <div class="fmt-box"><input type="text" class="input-line"><span class="sub-label">Prof</span></div> MM
+                    <span>FORMATO FINAL:</span>
+                    <div style="display: flex; align-items: baseline; margin-left: 10px;">
+                        <div class="spec-col-format">
+                            <input type="text" class="input-line" style="width: 100%;">
+                            <span class="small-subtext">Alt</span>
+                        </div>
+                        <span>X</span>
+                        <div class="spec-col-format">
+                            <input type="text" class="input-line" style="width: 100%;">
+                            <span class="small-subtext">Larg</span>
+                        </div>
+                        <span>X</span>
+                        <div class="spec-col-format">
+                            <input type="text" class="input-line" style="width: 100%;">
+                            <span class="small-subtext">Prof</span>
+                        </div>
+                        <span style="margin-left: 5px;">MM</span>
+                    </div>
                 </div>
+                
                 <div class="spec-item uppercase">
-                    CORES: <input type="text" class="input-line" style="width:40px"> X <input type="text" class="input-line" style="width:40px"> + <input type="text" class="input-line" style="width:120px">
+                    <span>CORES</span>
+                    <input type="text" class="input-line" style="width: 60px; margin: 0 5px;"> X
+                    <input type="text" class="input-line" style="width: 60px; margin: 0 5px;"> +
+                    <input type="text" class="input-line flex-grow" style="margin-left: 5px;">
                 </div>
-                <div class="spec-item uppercase" style="margin-bottom:0">
-                    F <input type="text" class="input-line" style="width:30px"> C/ <input type="text" class="input-line" style="width:30px"> IMAG <input type="text" class="input-line" style="width:60px"> X <input type="text" class="input-line" style="width:60px"> MM
+
+                <div class="spec-item uppercase" style="margin-bottom: 0;">
+                    <span>F</span> <input type="text" class="input-line" style="width: 40px; margin: 0 5px;">
+                    <span>C/</span> <input type="text" class="input-line" style="width: 40px; margin: 0 5px;">
+                    <span>IMAG</span> <input type="text" class="input-line" style="width: 80px; margin: 0 5px;">
+                    X <input type="text" class="input-line" style="width: 80px; margin: 0 5px;">
+                    <span>MM</span>
                 </div>
             </div>
-            <div class="specs-right uppercase">
-                OBS: <textarea style="width:100%; height:45px; vertical-align:top"></textarea>
+            <div class="specs-right uppercase bold">
+                <span>OBS:</span>
+                <textarea style="width: 100%; height: 60px; border: none; background: transparent; resize: none; font-family: inherit; font-size: inherit; outline: none; padding-top: 5px; font-weight: bold;"></textarea>
             </div>
         </div>
 
-        <div class="section-header">PAPÉIS</div>
-        <table>
-            <tr><th>DESCRIÇÃO</th><th>Quant 1</th><th>Valor 1</th><th>Quant 2</th><th>Valor 2</th></tr>
-            <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" class="v" data-t="1" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="1" data-c="2"></td></tr>
-            <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" class="v" data-t="1" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="1" data-c="2"></td></tr>
-        </table>
-        <div class="sub-row uppercase">SUB-TOTAL 01 <input type="text" id="st1-1" class="sub-box" readonly> <input type="text" id="st1-2" class="sub-box" readonly></div>
+        <div><div class="section-header">PAPÉIS</div></div>
+        <div class="table-responsive">
+            <table class="border-b">
+                <thead>
+                    <tr>
+                        <th class="col-desc">DESCRIÇÃO</th>
+                        <th class="col-num">Quant 1</th>
+                        <th class="col-num">Valor 1</th>
+                        <th class="col-num">Quant 2</th>
+                        <th class="col-num">Valor 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="2"></td></tr>
+                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="2"></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="subtotal-container uppercase">
+            <span>SUB-TOTAL 01</span>
+            <div class="subtotal-box-container"><input type="text" class="subtotal-box" id="sub1-col1" readonly placeholder="0,00"></div>
+            <div class="subtotal-box-container"><input type="text" class="subtotal-box" id="sub1-col2" readonly placeholder="0,00"></div>
+        </div>
 
-        <div class="section-header">OUTROS MATERIAIS</div>
-        <table>
-            <tr><th>DESCRIÇÃO</th><th>Quant 1</th><th>Valor 1</th><th>Quant 2</th><th>Valor 2</th></tr>
-            <tr><td class="col-desc">ARTE-FINAL / CTP</td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="2"></td></tr>
-            <tr><td class="col-desc">TINTA / FACA</td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="2"></td></tr>
-            <tr><td class="col-desc">LAMINAÇÃO / UV</td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="2"></td></tr>
-            <tr><td class="col-desc">ILHÓS / ALÇA</td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="2"></td></tr>
-        </table>
-        <div class="sub-row uppercase">SUB-TOTAL 02 <input type="text" id="st2-1" class="sub-box" readonly> <input type="text" id="st2-2" class="sub-box" readonly></div>
+        <div><div class="section-header">OUTROS MATERIAIS</div></div>
+        <div class="table-responsive">
+            <table class="border-b">
+                <thead>
+                    <tr>
+                        <th class="col-desc">DESCRIÇÃO</th>
+                        <th class="col-num">Quant 1</th>
+                        <th class="col-num">Valor 1</th>
+                        <th class="col-num">Quant 2</th>
+                        <th class="col-num">Valor 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="col-desc">ARTE-FINAL</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">CTP</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">TINTA</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">FACA</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">ILHÓS</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">ALÇA</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">LAMINAÇÃO FOSCA</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">PLASTIFICAÇÃO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">HOT-STAMPING</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">CLICHÊ HOT</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc">UV. LOCALIZADO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="subtotal-container uppercase">
+            <span>SUB-TOTAL 02</span>
+            <div class="subtotal-box-container"><input type="text" class="subtotal-box" id="sub2-col1" readonly placeholder="0,00"></div>
+            <div class="subtotal-box-container"><input type="text" class="subtotal-box" id="sub2-col2" readonly placeholder="0,00"></div>
+        </div>
 
-        <div class="section-header">TRANSFORMAÇÃO</div>
-        <table>
-            <tr><th>DESCRIÇÃO</th><th>Quant 1</th><th>Valor 1</th><th>Quant 2</th><th>Valor 2</th></tr>
-            <tr><td class="col-desc">IMPRESSÃO / CORTE E VINCO</td><td><input type="text"></td><td><input type="text" class="v" data-t="3" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="3" data-c="2"></td></tr>
-            <tr><td class="col-desc">ACABAMENTO MANUAL</td><td><input type="text"></td><td><input type="text" class="v" data-t="3" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="3" data-c="2"></td></tr>
-        </table>
-        <div class="sub-row uppercase">SUB-TOTAL 03 <input type="text" id="st3-1" class="sub-box" readonly> <input type="text" id="st3-2" class="sub-box" readonly></div>
+        <div><div class="section-header">TRANSFORMAÇÃO</div></div>
+        <div class="table-responsive">
+            <table class="border-b">
+                <thead>
+                    <tr>
+                        <th class="col-desc">DESCRIÇÃO</th>
+                        <th class="col-num">Quant 1</th>
+                        <th class="col-num">Valor 1</th>
+                        <th class="col-num">Quant 2</th>
+                        <th class="col-num">Valor 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="col-desc">ACERTO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
+                    <tr><td class="col-desc">IMPRESSÃO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
+                    <tr><td class="col-desc">IMPRESSÃO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
+                    <tr><td class="col-desc">CORTE E VINCO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
+                    <tr><td class="col-desc">ACABAMENTO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
+                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
+                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="subtotal-container uppercase">
+            <span>SUB-TOTAL 03</span>
+            <div class="subtotal-box-container"><input type="text" class="subtotal-box" id="sub3-col1" readonly placeholder="0,00"></div>
+            <div class="subtotal-box-container"><input type="text" class="subtotal-box" id="sub3-col2" readonly placeholder="0,00"></div>
+        </div>
 
-        <div class="footer-sec">
-            <div class="footer-l uppercase">
-                <div style="text-align:center; margin-bottom:10px">CONDIÇÕES COMERCIAIS</div>
-                <div>PAGTO: <input type="text" class="input-line" style="width:70%"></div>
-                <div style="margin-top:5px">IMPOSTOS: <input type="text" class="input-line" style="width:65%"></div>
+        <div class="commercial-section">
+            <div class="cond-left">
+                <div class="commercial-title uppercase">CONDIÇÕES COMERCIAIS</div>
+                <div class="cond-item uppercase">
+                    <span>COND.PAGTº:</span>
+                    <input type="text" class="input-line flex-grow">
+                </div>
+                <div class="cond-item uppercase">
+                    <span>IMPOSTOS:</span>
+                    <input type="text" class="input-line flex-grow">
+                </div>
             </div>
-            <div class="footer-r uppercase bold">
-                <div style="text-align:center; margin-bottom:10px">PREÇO DE VENDA</div>
-                <div class="price-line">1ª: QNT: <input type="text" class="input-line" style="width:60px"> R$ <input type="text" class="input-line" style="width:70px"> U. <input type="text" class="input-line" style="width:50px"></div>
-                <div class="price-line">2ª: QNT: <input type="text" class="input-line" style="width:60px"> R$ <input type="text" class="input-line" style="width:70px"> U. <input type="text" class="input-line" style="width:50px"></div>
+            
+            <div class="cond-right">
+                <div class="commercial-title uppercase">PREÇO DE VENDA</div>
+                <div class="price-line uppercase">
+                    <span>1ª :QUANT :</span>
+                    <input type="text" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px;">
+                    <span>R$</span>
+                    <input type="text" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px;">
+                    <span style="text-transform: lowercase;">u.</span>
+                    <input type="text" class="input-line flex-grow" style="margin-left: 5px; min-width: 30px;">
+                </div>
+                <div class="price-line uppercase">
+                    <span>2ª :QUANT :</span>
+                    <input type="text" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px;">
+                    <span>R$</span>
+                    <input type="text" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px;">
+                    <span style="text-transform: lowercase;">u.</span>
+                    <input type="text" class="input-line flex-grow" style="margin-left: 5px; min-width: 30px;">
+                </div>
             </div>
         </div>
+
     </div>
 </div>
 
-<button class="print-btn" onclick="window.print()">🖨️ IMPRIMIR OU SALVAR COMO PDF</button>
+<div class="print-controls">
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+</div>
 
 <script>
-    function parseV(s) {
-        if(!s) return 0;
-        s = s.replace(/[^\d.,]/g, '').replace(',', '.');
-        return parseFloat(s) || 0;
+    // Função para preencher a data atual automaticamente
+    function setDateToday() {
+        const today = new Date();
+        const dia = String(today.getDate()).padStart(2, '0');
+        const mes = String(today.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
+        const ano = today.getFullYear();
+
+        document.getElementById('data-dia').value = dia;
+        document.getElementById('data-mes').value = mes;
+        document.getElementById('data-ano').value = ano;
     }
 
-    function formatV(n) {
-        return n.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    function parseNumber(str) {
+        if (!str) return 0;
+        str = str.replace(/[^\d.,]/g, '');
+        str = str.replace(',', '.');
+        let val = parseFloat(str);
+        return isNaN(val) ? 0 : val;
     }
 
-    function calc() {
-        for(let t=1; t<=3; t++) {
-            for(let c=1; c<=2; c++) {
+    function formatNumber(num) {
+        return num.toFixed(2).replace('.', ',');
+    }
+
+    function calculateTotals() {
+        for (let t = 1; t <= 3; t++) {
+            for (let c = 1; c <= 2; c++) {
                 let sum = 0;
-                document.querySelectorAll(`.v[data-t="${t}"][data-c="${c}"]`).forEach(i => sum += parseV(i.value));
-                let box = document.getElementById(`st${t}-${c}`);
-                box.value = sum > 0 ? formatV(sum) : '';
+                let inputs = document.querySelectorAll(`.calc-input[data-table="${t}"][data-col="${c}"]`);
+                
+                inputs.forEach(input => {
+                    sum += parseNumber(input.value);
+                });
+                
+                let subtotalBox = document.getElementById(`sub${t}-col${c}`);
+                if (subtotalBox) {
+                    subtotalBox.value = sum > 0 ? formatNumber(sum) : '';
+                }
             }
         }
     }
 
-    window.onload = function() {
-        const d = new Date();
-        document.getElementById('dia').value = String(d.getDate()).padStart(2,'0');
-        document.getElementById('mes').value = String(d.getMonth()+1).padStart(2,'0');
-        document.getElementById('ano').value = d.getFullYear();
-        document.querySelectorAll('.v').forEach(i => i.addEventListener('input', calc));
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        setDateToday(); // Chama a data automática ao carregar
+        const calcInputs = document.querySelectorAll('.calc-input');
+        calcInputs.forEach(input => {
+            input.addEventListener('input', calculateTotals);
+        });
+    });
 </script>
 
 </body>
