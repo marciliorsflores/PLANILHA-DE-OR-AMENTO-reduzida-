@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Planilha de Custos - MC Serigrafia</title>
     <style>
-        /* Reset e Estilos de Tela */
+        /* Reset de Estilos */
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: Arial, sans-serif;
             font-size: 11px;
             color: #000;
-            line-height: 1.2;
             background-color: #525659;
             display: flex;
             flex-direction: column;
@@ -20,7 +19,7 @@
             padding: 20px;
         }
 
-        /* Container da Folha A4 */
+        /* Página A4 */
         .page-a4 {
             width: 210mm;
             min-height: 297mm;
@@ -28,7 +27,6 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             padding: 10mm;
             margin-bottom: 20px;
-            position: relative;
         }
 
         .form-container {
@@ -42,79 +40,75 @@
         /* Utilitários */
         .bold { font-weight: bold; }
         .uppercase { text-transform: uppercase; }
-        .flex { display: flex; }
-        .flex-col { display: flex; flex-direction: column; }
-        .flex-grow { flex-grow: 1; }
         .border-b { border-bottom: 1px solid #000; }
         .border-r { border-right: 1px solid #000; }
         
         input, textarea {
             font-family: inherit;
             font-size: inherit;
-            color: #000;
-            background-color: transparent;
+            background: transparent;
             border: none;
             outline: none;
             font-weight: bold;
         }
         
-        input:focus, textarea:focus { background-color: rgba(255, 255, 0, 0.1); }
+        input:focus { background-color: rgba(255, 255, 0, 0.1); }
+        .input-line { border-bottom: 1px solid #000; text-align: center; }
 
         /* Cabeçalho */
         .header-top { display: flex; border-bottom: 2px solid #000; }
         .header-title-container { width: 70%; padding: 10px; display: flex; align-items: center; }
         .header-title { font-size: 38px; font-weight: 800; letter-spacing: -1px; }
-        .header-info { width: 30%; background-color: #dcdcdc; padding: 8px; display: flex; flex-direction: column; justify-content: center; }
+        .header-info { width: 30%; background-color: #dcdcdc; padding: 8px; font-weight: bold; display: flex; flex-direction: column; justify-content: center; }
         
-        .input-line { border-bottom: 1px solid #000; text-align: center; }
-        .client-row, .desc-row { padding: 5px; border-bottom: 1px solid #000; }
+        .row-info { padding: 5px; border-bottom: 1px solid #000; font-weight: bold; }
 
         /* Especificações */
         .specs-row { display: flex; border-bottom: 1px solid #000; }
         .specs-left { width: 60%; border-right: 1px solid #000; padding: 8px; }
-        .specs-right { width: 40%; padding: 8px; }
-        .spec-item { margin-bottom: 6px; display: flex; align-items: baseline; white-space: nowrap; }
+        .specs-right { width: 40%; padding: 8px; font-weight: bold; }
+        .spec-item { margin-bottom: 6px; display: flex; align-items: baseline; white-space: nowrap; font-weight: bold; }
         
-        .format-box { display: inline-flex; flex-direction: column; align-items: center; width: 50px; margin: 0 3px; }
-        .small-label { font-size: 8px; text-transform: uppercase; font-weight: normal; margin-top: -2px; }
+        .fmt-box { display: inline-flex; flex-direction: column; align-items: center; width: 50px; margin: 0 3px; }
+        .sub-label { font-size: 8px; text-transform: uppercase; font-weight: normal; margin-top: -2px; }
 
         /* Tabelas */
-        .section-header { background-color: #333; color: #fff; font-weight: bold; padding: 3px 10px; margin-top: 4px; display: inline-block; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
-        th, td { border: 1px solid #000; height: 20px; }
-        th { background-color: #f0f0f0; text-align: center; padding: 2px; }
+        .section-header { background-color: #333; color: #fff; font-weight: bold; padding: 3px 10px; margin-top: 5px; display: inline-block; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2px; }
+        th, td { border: 1px solid #000; height: 18px; }
+        th { background-color: #f0f0f0; padding: 2px; }
         td input { width: 100%; height: 100%; text-align: center; }
-        .col-desc { width: 45%; text-align: left; padding-left: 5px; }
+        .col-desc { text-align: left; padding-left: 5px; width: 45%; }
 
         /* Subtotais */
-        .subtotal-row { display: flex; justify-content: flex-end; align-items: center; margin: 2px 0 6px 0; font-weight: bold; }
+        .sub-row { display: flex; justify-content: flex-end; align-items: center; margin: 2px 0 5px 0; font-weight: bold; }
         .sub-box { border: 1px solid #000; width: 90px; height: 20px; margin-left: 20px; text-align: right; padding-right: 5px; background-color: #f9f9f9; }
 
         /* Rodapé */
-        .footer-section { display: flex; border-top: 1px solid #000; }
+        .footer-sec { display: flex; border-top: 1px solid #000; }
         .footer-l { width: 45%; background-color: #dcdcdc; border-right: 1px solid #000; padding: 8px; }
         .footer-r { width: 55%; padding: 8px; }
-        .price-line { display: flex; align-items: baseline; margin-bottom: 5px; flex-wrap: nowrap; white-space: nowrap; }
+        .price-line { display: flex; align-items: baseline; margin-bottom: 5px; white-space: nowrap; font-weight: bold; }
 
-        /* Controles */
-        .print-controls { margin-top: 20px; width: 210mm; display: flex; justify-content: center; }
-        .print-btn { background-color: #007bff; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        /* Botão */
+        .print-btn { background-color: #007bff; color: white; border: none; padding: 15px; width: 210mm; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 40px; }
 
-        /* Impressão */
+        /* Configurações de Impressão */
         @page { size: A4; margin: 0; }
         @media print {
             body { background: white; padding: 0; }
             .page-a4 { box-shadow: none; margin: 0; width: 210mm; height: 297mm; padding: 10mm; overflow: hidden; }
-            .print-controls { display: none; }
+            .print-btn { display: none; }
             .header-info, .footer-l { -webkit-print-color-adjust: exact; background-color: #dcdcdc !important; }
             .section-header { -webkit-print-color-adjust: exact; background-color: #333 !important; }
         }
 
-        /* Mobile */
+        /* Responsividade Celular */
         @media screen and (max-width: 800px) {
             .page-a4 { width: 100%; min-height: auto; padding: 5px; }
-            .header-top, .specs-row, .footer-section { flex-direction: column; }
+            .header-top, .specs-row, .footer-sec { flex-direction: column; }
             .header-title-container, .header-info, .specs-left, .specs-right, .footer-l, .footer-r { width: 100%; border-right: none; }
+            .print-btn { width: 100%; }
         }
     </style>
 </head>
@@ -124,74 +118,73 @@
     <div class="form-container">
         <div class="header-top">
             <div class="header-title-container border-r">
-                <h1 class="header-title uppercase">PLANILHA DE CUSTOS</h1>
+                <span class="header-title uppercase">PLANILHA DE CUSTOS</span>
             </div>
             <div class="header-info">
-                <div class="date-line uppercase">
+                <div class="uppercase">
                     DATA 
-                    <input type="text" id="d-dia" class="input-line" style="width:22px" maxlength="2">/
-                    <input type="text" id="d-mes" class="input-line" style="width:22px" maxlength="2">/
-                    <input type="text" id="d-ano" class="input-line" style="width:35px" maxlength="4">
+                    <input type="text" id="dia" class="input-line" style="width:22px" maxlength="2">/
+                    <input type="text" id="mes" class="input-line" style="width:22px" maxlength="2">/
+                    <input type="text" id="ano" class="input-line" style="width:35px" maxlength="4">
                 </div>
-                <div class="uppercase" style="margin-top:5px">VEND: <input type="text" style="width:80%"></div>
+                <div style="margin-top:5px">VEND: <input type="text" style="width:70%"></div>
             </div>
         </div>
 
-        <div class="client-row uppercase bold">CLIENTE: <input type="text" style="width:85%"></div>
-        <div class="desc-row uppercase bold">DESCRIÇÃO: <input type="text" style="width:85%"></div>
+        <div class="row-info uppercase">CLIENTE: <input type="text" style="width:85%"></div>
+        <div class="row-info uppercase">DESCRIÇÃO: <input type="text" style="width:85%"></div>
 
         <div class="specs-row">
             <div class="specs-left">
                 <div class="spec-item uppercase">
                     FORMATO FINAL: 
-                    <div class="format-box"><input type="text" class="input-line"><span class="small-label">Alt</span></div> X
-                    <div class="format-box"><input type="text" class="input-line"><span class="small-label">Larg</span></div> X
-                    <div class="format-box"><input type="text" class="input-line"><span class="small-label">Prof</span></div> MM
+                    <div class="fmt-box"><input type="text" class="input-line"><span class="sub-label">Alt</span></div> X
+                    <div class="fmt-box"><input type="text" class="input-line"><span class="sub-label">Larg</span></div> X
+                    <div class="fmt-box"><input type="text" class="input-line"><span class="sub-label">Prof</span></div> MM
                 </div>
                 <div class="spec-item uppercase">
-                    CORES: <input type="text" class="input-line" style="width:40px"> X <input type="text" class="input-line" style="width:40px"> + <input type="text" class="input-line flex-grow">
+                    CORES: <input type="text" class="input-line" style="width:40px"> X <input type="text" class="input-line" style="width:40px"> + <input type="text" class="input-line" style="width:120px">
                 </div>
                 <div class="spec-item uppercase" style="margin-bottom:0">
                     F <input type="text" class="input-line" style="width:30px"> C/ <input type="text" class="input-line" style="width:30px"> IMAG <input type="text" class="input-line" style="width:60px"> X <input type="text" class="input-line" style="width:60px"> MM
                 </div>
             </div>
-            <div class="specs-right uppercase bold">
-                OBS: <textarea style="width:100%; height:50px;"></textarea>
+            <div class="specs-right uppercase">
+                OBS: <textarea style="width:100%; height:45px; vertical-align:top"></textarea>
             </div>
         </div>
 
         <div class="section-header">PAPÉIS</div>
         <table>
             <tr><th>DESCRIÇÃO</th><th>Quant 1</th><th>Valor 1</th><th>Quant 2</th><th>Valor 2</th></tr>
-            <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" class="val" data-t="1" data-c="1"></td><td><input type="text"></td><td><input type="text" class="val" data-t="1" data-c="2"></td></tr>
-            <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" class="val" data-t="1" data-c="1"></td><td><input type="text"></td><td><input type="text" class="val" data-t="1" data-c="2"></td></tr>
+            <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" class="v" data-t="1" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="1" data-c="2"></td></tr>
+            <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" class="v" data-t="1" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="1" data-c="2"></td></tr>
         </table>
-        <div class="subtotal-row uppercase">SUB-TOTAL 01 <input type="text" id="s1-1" class="sub-box" readonly> <input type="text" id="s1-2" class="sub-box" readonly></div>
+        <div class="sub-row uppercase">SUB-TOTAL 01 <input type="text" id="st1-1" class="sub-box" readonly> <input type="text" id="st1-2" class="sub-box" readonly></div>
 
         <div class="section-header">OUTROS MATERIAIS</div>
         <table>
             <tr><th>DESCRIÇÃO</th><th>Quant 1</th><th>Valor 1</th><th>Quant 2</th><th>Valor 2</th></tr>
-            <tr><td class="col-desc">ARTE-FINAL</td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="2"></td></tr>
-            <tr><td class="col-desc">CTP</td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="2"></td></tr>
-            <tr><td class="col-desc">TINTA</td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="2"></td></tr>
-            <tr><td class="col-desc">ILHÓS / ALÇA</td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="2"></td></tr>
-            <tr><td class="col-desc">ACABAMENTOS ESPECIAIS</td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="val" data-t="2" data-c="2"></td></tr>
+            <tr><td class="col-desc">ARTE-FINAL / CTP</td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="2"></td></tr>
+            <tr><td class="col-desc">TINTA / FACA</td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="2"></td></tr>
+            <tr><td class="col-desc">LAMINAÇÃO / UV</td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="2"></td></tr>
+            <tr><td class="col-desc">ILHÓS / ALÇA</td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="2" data-c="2"></td></tr>
         </table>
-        <div class="subtotal-row uppercase">SUB-TOTAL 02 <input type="text" id="s2-1" class="sub-box" readonly> <input type="text" id="s2-2" class="sub-box" readonly></div>
+        <div class="sub-row uppercase">SUB-TOTAL 02 <input type="text" id="st2-1" class="sub-box" readonly> <input type="text" id="st2-2" class="sub-box" readonly></div>
 
         <div class="section-header">TRANSFORMAÇÃO</div>
         <table>
             <tr><th>DESCRIÇÃO</th><th>Quant 1</th><th>Valor 1</th><th>Quant 2</th><th>Valor 2</th></tr>
-            <tr><td class="col-desc">IMPRESSÃO / CORTE E VINCO</td><td><input type="text"></td><td><input type="text" class="val" data-t="3" data-c="1"></td><td><input type="text"></td><td><input type="text" class="val" data-t="3" data-c="2"></td></tr>
-            <tr><td class="col-desc">ACABAMENTO MANUAL</td><td><input type="text"></td><td><input type="text" class="val" data-t="3" data-c="1"></td><td><input type="text"></td><td><input type="text" class="val" data-t="3" data-c="2"></td></tr>
+            <tr><td class="col-desc">IMPRESSÃO / CORTE E VINCO</td><td><input type="text"></td><td><input type="text" class="v" data-t="3" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="3" data-c="2"></td></tr>
+            <tr><td class="col-desc">ACABAMENTO MANUAL</td><td><input type="text"></td><td><input type="text" class="v" data-t="3" data-c="1"></td><td><input type="text"></td><td><input type="text" class="v" data-t="3" data-c="2"></td></tr>
         </table>
-        <div class="subtotal-row uppercase">SUB-TOTAL 03 <input type="text" id="s3-1" class="sub-box" readonly> <input type="text" id="s3-2" class="sub-box" readonly></div>
+        <div class="sub-row uppercase">SUB-TOTAL 03 <input type="text" id="st3-1" class="sub-box" readonly> <input type="text" id="st3-2" class="sub-box" readonly></div>
 
-        <div class="footer-section">
-            <div class="footer-l uppercase bold">
+        <div class="footer-sec">
+            <div class="footer-l uppercase">
                 <div style="text-align:center; margin-bottom:10px">CONDIÇÕES COMERCIAIS</div>
-                <div>COND. PAGTO: <input type="text" class="input-line" style="width:60%"></div>
-                <div style="margin-top:8px">IMPOSTOS: <input type="text" class="input-line" style="width:65%"></div>
+                <div>PAGTO: <input type="text" class="input-line" style="width:70%"></div>
+                <div style="margin-top:5px">IMPOSTOS: <input type="text" class="input-line" style="width:65%"></div>
             </div>
             <div class="footer-r uppercase bold">
                 <div style="text-align:center; margin-bottom:10px">PREÇO DE VENDA</div>
@@ -202,9 +195,7 @@
     </div>
 </div>
 
-<div class="print-controls">
-    <button class="print-btn" onclick="window.print()">🖨️ IMPRIMIR / SALVAR PDF</button>
-</div>
+<button class="print-btn" onclick="window.print()">🖨️ IMPRIMIR OU SALVAR COMO PDF</button>
 
 <script>
     function parseV(s) {
@@ -221,22 +212,20 @@
         for(let t=1; t<=3; t++) {
             for(let c=1; c<=2; c++) {
                 let sum = 0;
-                document.querySelectorAll(`.val[data-t="${t}"][data-c="${c}"]`).forEach(i => sum += parseV(i.value));
-                let out = document.getElementById(`s${t}-${c}`);
-                out.value = sum > 0 ? formatV(sum) : '';
+                document.querySelectorAll(`.v[data-t="${t}"][data-c="${c}"]`).forEach(i => sum += parseV(i.value));
+                let box = document.getElementById(`st${t}-${c}`);
+                box.value = sum > 0 ? formatV(sum) : '';
             }
         }
     }
 
-    function init() {
+    window.onload = function() {
         const d = new Date();
-        document.getElementById('d-dia').value = String(d.getDate()).padStart(2,'0');
-        document.getElementById('d-mes').value = String(d.getMonth()+1).padStart(2,'0');
-        document.getElementById('d-ano').value = d.getFullYear();
-        document.querySelectorAll('.val').forEach(i => i.addEventListener('input', calc));
+        document.getElementById('dia').value = String(d.getDate()).padStart(2,'0');
+        document.getElementById('mes').value = String(d.getMonth()+1).padStart(2,'0');
+        document.getElementById('ano').value = d.getFullYear();
+        document.querySelectorAll('.v').forEach(i => i.addEventListener('input', calc));
     }
-
-    window.onload = init;
 </script>
 
 </body>
