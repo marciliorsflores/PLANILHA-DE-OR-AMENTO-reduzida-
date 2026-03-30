@@ -151,7 +151,65 @@
         .btn-new:hover { background-color: #218838; }
         .btn-clear { background-color: #dc3545; }
         .btn-clear:hover { background-color: #c82333; }
+/* =========================================
+           RESPONSIVIDADE (CELULARES E TABLETS)
+           ========================================= */
 
+        /* 1. Remove a largura fixa e permite que a folha encolha */
+        .search-panel, .page-a4, .print-controls {
+            width: 100%;
+            max-width: 210mm;
+        }
+
+        /* 2. Regras ativadas apenas em telas menores que 768px */
+        @media screen and (max-width: 768px) {
+            
+            /* Empilha o cabeçalho, especificações, rodapé e botões */
+            .header-top, .specs-row, .commercial-section, .print-controls {
+                flex-direction: column;
+            }
+
+            /* Faz os blocos ocuparem 100% da largura da tela do celular */
+            .header-title-container, .header-info, 
+            .specs-left, .specs-right, 
+            .cond-left, .cond-right {
+                width: 100%;
+                border-right: none !important; /* Remove as linhas verticais que sobraram */
+            }
+
+            /* Adiciona linhas horizontais para separar os blocos que foram empilhados */
+            .header-title-container, .specs-left, .cond-left {
+                border-bottom: 2px solid #000;
+            }
+
+            /* Ajusta a barra de busca para celular */
+            .search-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-input { 
+                width: 100%; 
+            }
+
+            /* Diminui a fonte do título principal para não vazar da tela */
+            .header-title {
+                font-size: 26px;
+                text-align: center;
+                justify-content: center;
+                width: 100%;
+            }
+
+            /* Organiza as condições comerciais e especificações */
+            .spec-item, .price-line {
+                flex-wrap: wrap;
+            }
+            
+            /* Ajusta os botões para ficarem um embaixo do outro */
+            .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
         /* Impressão A4 */
         @page { size: A4; margin: 0; }
         @media print {
