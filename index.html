@@ -218,6 +218,20 @@
             html, body { width: 210mm; height: 297mm; background-color: #fff; padding: 0; margin: 0; }
             .page-a4 { width: 210mm; height: 297mm; padding: 10mm; box-shadow: none; margin: 0; border: none; overflow: hidden; }
         }
+        .assinatura-amigo {
+            font-size: 10px;
+            color: #aaa;
+            text-align: center;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            width: 100%;
+            font-style: italic;
+        }
+        @media print {
+            .assinatura-amigo { 
+                display: none !important; 
+            } /* Esconde a mensagem na hora de imprimir para a folha do cliente ficar limpa */
+        }
     </style>
 </head>
 <body>
@@ -396,6 +410,7 @@
     <button class="btn btn-new" onclick="finalizarProcesso('novo')">➕ SALVAR COMO NOVO NÚMERO</button>
     <button class="btn btn-clear" onclick="limparFormulario()">🧹 LIMPAR FORMULÁRIO</button>
 </div>
+<div class="assinatura-amigo">Criado por Marcilio Flores 03/2026 Teu Amigao do RS</div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2mtPLT6jmofB0-88R_W8OzHD55bP8B-wlwT4ibyOAGIA8Rnf_k5zADDy-uYYYaae5Tw/exec";
