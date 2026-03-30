@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planilha de Custos - Interativa e Automática</title>
+    <title>Planilha de Custos - MC Serigrafia e Gráfica</title>
     <style>
         /* Estilos de Reinicialização */
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,7 +22,33 @@
             min-height:100vh;
         }
 
-        /* Simulando a Folha A4 de Papel (Desktop) */
+        /* --- PAINEL DE BUSCA (ESTILO) --- */
+        .search-panel {
+            width: 210mm;
+            background: #222;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .search-row { display: flex; gap: 10px; align-items: center; }
+        .search-input { background: white; color: black; padding: 8px; border-radius: 4px; border: none; width: 120px; font-weight: bold; }
+        .btn-search { background: #444; color: white; border: 1px solid #666; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .btn-search:hover { background: #555; }
+        
+        #lista-pedidos { 
+            background: white; color: black; border-radius: 4px; 
+            max-height: 200px; overflow-y: auto; display: none; 
+            margin-top: 5px; border: 1px solid #ccc;
+        }
+        .pedido-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
+        .pedido-item:hover { background: #f0f0f0; }
+
+        /* Simulando a Folha A4 */
         .page-a4 {
             width: 210mm;
             min-height: 297mm;
@@ -32,7 +58,6 @@
             margin-bottom: 20px;
         }
 
-        /* Borda preta principal do formulário */
         .form-container {
             border: 2px solid #000;
             padding: 2px;
@@ -49,7 +74,6 @@
         .border-b { border-bottom: 1px solid #000; }
         .border-r { border-right: 1px solid #000; }
 
-        /* Estilos para os Campos Digitáveis (Inputs) */
         input {
             font-family: inherit;
             font-size: inherit;
@@ -58,20 +82,10 @@
             border: none;
             outline: none;
         }
-        input:focus {
-            background-color: rgba(255, 255, 0, 0.2); 
-        }
+        input:focus { background-color: rgba(255, 255, 0, 0.2); }
         
-        .input-line {
-            border-bottom: 1px solid #000;
-            text-align: center;
-            font-weight: bold;
-        }
-        .input-text {
-            font-weight: bold;
-            padding-left: 5px;
-            width: 100%;
-        }
+        .input-line { border-bottom: 1px solid #000; text-align: center; font-weight: bold; }
+        .input-text { font-weight: bold; padding-left: 5px; width: 100%; }
 
         /* Cabeçalho */
         .header-top { display: flex; border-bottom: 2px solid #000; }
@@ -113,7 +127,6 @@
         .subtotal-container { display: flex; justify-content: flex-end; align-items: center; margin-top: 2px; margin-bottom: 8px; font-weight: bold; }
         .subtotal-box-container { margin-left: 30px; }
         .subtotal-box { border: 1px solid #000; width: 100px; height: 22px; text-align: right; padding-right: 5px; font-weight: bold; background-color: #f9f9f9; color: #000;}
-        .subtotal-box:focus { background-color: #f9f9f9; } 
 
         /* Rodapé - Condições e Venda */
         .commercial-section { display: flex; border-top: 2px solid #000; font-size: 11px; }
@@ -126,55 +139,39 @@
         
         .price-line { display: flex; margin-bottom: 8px; align-items: baseline; flex-wrap: nowrap; font-weight: bold; white-space: nowrap; }
 
-        /* Botão de Impressão */
+        /* Botões */
         .print-controls {
             width: 100%; max-width: 210mm; display: flex; justify-content: center;
-            margin-top: 10px; margin-bottom: 30px;
+            margin-top: 10px; margin-bottom: 30px; gap: 10px;
         }
-        .print-btn {
-            background-color: #007bff; color: white; border: none; padding: 15px 30px;
-            font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background-color 0.3s; width: 100%;
-        }
-        .print-btn:hover { background-color: #0056b3; }
-
-        /* Responsividade Mobile */
-        @media screen and (max-width: 800px) {
-            body { padding: 10px; }
-            .page-a4 { width: 100%; min-height: auto; padding: 10px; box-shadow: none; }
-            .header-top, .specs-row, .commercial-section { flex-direction: column; }
-            .header-title-container, .header-info, .specs-left, .specs-right, .cond-left, .cond-right { width: 100%; border-right: none; }
-            .header-info { border-top: 2px solid #000; }
-            .specs-left { border-bottom: 1px solid #000; }
-            .cond-left { border-bottom: 2px solid #000; }
-            .header-title { font-size: 28px; }
-            .subtotal-container { flex-direction: column; align-items: flex-end; gap: 5px; }
-            .subtotal-box-container { margin-left: 0; }
-        }
+        .btn { padding: 15px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 14px; flex: 1; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: 0.3s; }
+        .btn-update { background-color: #007bff; }
+        .btn-update:hover { background-color: #0056b3; }
+        .btn-new { background-color: #28a745; }
+        .btn-new:hover { background-color: #218838; }
+        .btn-clear { background-color: #dc3545; }
+        .btn-clear:hover { background-color: #c82333; }
 
         /* Impressão A4 */
         @page { size: A4; margin: 0; }
         @media print {
+            .search-panel, .print-controls { display: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             html, body { width: 210mm; height: 297mm; background-color: #fff; padding: 0; margin: 0; }
             .page-a4 { width: 210mm; height: 297mm; padding: 10mm; box-shadow: none; margin: 0; border: none; overflow: hidden; }
-            .print-controls { display: none; }
-            input:focus { background-color: transparent; }
-            .header-top { flex-direction: row !important; }
-            .header-title-container { width: 70% !important; border-right: 1px solid #000 !important; }
-            .header-info { width: 30% !important; border-top: none !important; }
-            .specs-row { flex-direction: row !important; }
-            .specs-left { width: 60% !important; border-right: 1px solid #000 !important; border-bottom: none !important; }
-            .specs-right { width: 40% !important; }
-            .commercial-section { flex-direction: row !important; }
-            .cond-left { width: 48% !important; border-right: 1px solid #000 !important; border-bottom: none !important; }
-            .cond-right { width: 52% !important; }
-            .subtotal-container { flex-direction: row !important; align-items: center !important; }
-            .subtotal-box-container { margin-left: 30px !important; }
         }
     </style>
 </head>
 <body>
+
+<div class="search-panel">
+    <div class="search-row">
+        <span>BUSCAR POR VENDEDOR:</span>
+        <input type="text" id="filtro-vendedor" class="search-input" placeholder="INICIAIS">
+        <button class="btn-search" onclick="buscarOrcamentos()">🔍 LISTAR PEDIDOS</button>
+    </div>
+    <div id="lista-pedidos"></div>
+</div>
 
 <div class="page-a4">
     <div class="form-container flex-col">
@@ -191,17 +188,20 @@
                     <input type="text" class="input-line" id="data-ano" style="width: 35px; margin: 0 5px;" maxlength="4">
                 </div>
                 <div class="vend-line uppercase">
-                    VEND: <input type="text" class="input-text">
+                    VEND: <input type="text" id="vendedor" class="input-text" placeholder="INICIAIS">
+                </div>
+                <div class="vend-line uppercase" style="color: #cc0000; font-size: 9px; margin-top: 2px;">
+                    ORÇ: <input type="text" id="id-orcamento" class="input-line" style="width: 100px; color: #cc0000;" readonly placeholder="GERANDO...">
                 </div>
             </div>
         </div>
 
         <div class="flex border-b client-vend-row uppercase">
-            CLIENTE : <input type="text" class="input-text flex-grow">
+            CLIENTE : <input type="text" id="cliente" class="input-text flex-grow">
         </div>
 
         <div class="flex border-b desc-row uppercase">
-            DESCRIÇÃO : <input type="text" class="input-text flex-grow">
+            DESCRIÇÃO : <input type="text" id="descricao" class="input-text flex-grow">
         </div>
 
         <div class="specs-row">
@@ -209,37 +209,23 @@
                 <div class="spec-item uppercase">
                     <span>FORMATO FINAL:</span>
                     <div style="display: flex; align-items: baseline; margin-left: 10px;">
-                        <div class="spec-col-format">
-                            <input type="text" class="input-line" style="width: 100%;">
-                            <span class="small-subtext">Alt</span>
-                        </div>
+                        <div class="spec-col-format"><input type="text" class="input-line" style="width: 100%;"><span class="small-subtext">Alt</span></div>
                         <span>X</span>
-                        <div class="spec-col-format">
-                            <input type="text" class="input-line" style="width: 100%;">
-                            <span class="small-subtext">Larg</span>
-                        </div>
+                        <div class="spec-col-format"><input type="text" class="input-line" style="width: 100%;"><span class="small-subtext">Larg</span></div>
                         <span>X</span>
-                        <div class="spec-col-format">
-                            <input type="text" class="input-line" style="width: 100%;">
-                            <span class="small-subtext">Prof</span>
-                        </div>
+                        <div class="spec-col-format"><input type="text" class="input-line" style="width: 100%;"><span class="small-subtext">Prof</span></div>
                         <span style="margin-left: 5px;">MM</span>
                     </div>
                 </div>
-                
                 <div class="spec-item uppercase">
                     <span>CORES</span>
-                    <input type="text" class="input-line" style="width: 60px; margin: 0 5px;"> X
-                    <input type="text" class="input-line" style="width: 60px; margin: 0 5px;"> +
-                    <input type="text" class="input-line flex-grow" style="margin-left: 5px;">
+                    <input type="text" class="input-line" style="width: 40px; margin: 0 5px;"> X <input type="text" class="input-line" style="width: 40px; margin: 0 5px;"> + <input type="text" class="input-line flex-grow" style="margin-left: 5px;">
                 </div>
-
                 <div class="spec-item uppercase" style="margin-bottom: 0;">
-                    <span>F</span> <input type="text" class="input-line" style="width: 40px; margin: 0 5px;">
-                    <span>C/</span> <input type="text" class="input-line" style="width: 40px; margin: 0 5px;">
-                    <span>IMAG</span> <input type="text" class="input-line" style="width: 80px; margin: 0 5px;">
-                    X <input type="text" class="input-line" style="width: 80px; margin: 0 5px;">
-                    <span>MM</span>
+                    <span>F</span> <input type="text" class="input-line" style="width: 35px; margin: 0 5px;">
+                    <span>C/</span> <input type="text" class="input-line" style="width: 35px; margin: 0 5px;">
+                    <span>IMAG</span> <input type="text" class="input-line" style="width: 60px; margin: 0 5px;">
+                    X <input type="text" class="input-line" style="width: 60px; margin: 0 5px;"> <span>MM</span>
                 </div>
             </div>
             <div class="specs-right uppercase bold">
@@ -250,17 +236,13 @@
 
         <div><div class="section-header">PAPÉIS</div></div>
         <div class="table-responsive">
-            <table class="border-b">
+            <table>
                 <thead>
-                    <tr>
-                        <th class="col-desc">DESCRIÇÃO</th>
-                        <th class="col-num">Quant 1</th>
-                        <th class="col-num">Valor 1</th>
-                        <th class="col-num">Quant 2</th>
-                        <th class="col-num">Valor 2</th>
-                    </tr>
+                    <tr><th class="col-desc">DESCRIÇÃO</th><th class="col-num">Quant 1</th><th class="col-num">Valor 1</th><th class="col-num">Quant 2</th><th class="col-num">Valor 2</th></tr>
                 </thead>
                 <tbody>
+                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="2"></td></tr>
+                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="2"></td></tr>
                     <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="2"></td></tr>
                     <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="1" data-col="2"></td></tr>
                 </tbody>
@@ -274,15 +256,9 @@
 
         <div><div class="section-header">OUTROS MATERIAIS</div></div>
         <div class="table-responsive">
-            <table class="border-b">
+            <table>
                 <thead>
-                    <tr>
-                        <th class="col-desc">DESCRIÇÃO</th>
-                        <th class="col-num">Quant 1</th>
-                        <th class="col-num">Valor 1</th>
-                        <th class="col-num">Quant 2</th>
-                        <th class="col-num">Valor 2</th>
-                    </tr>
+                    <tr><th class="col-desc">DESCRIÇÃO</th><th class="col-num">Quant 1</th><th class="col-num">Valor 1</th><th class="col-num">Quant 2</th><th class="col-num">Valor 2</th></tr>
                 </thead>
                 <tbody>
                     <tr><td class="col-desc">ARTE-FINAL</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
@@ -296,8 +272,7 @@
                     <tr><td class="col-desc">HOT-STAMPING</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
                     <tr><td class="col-desc">CLICHÊ HOT</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
                     <tr><td class="col-desc">UV. LOCALIZADO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
-                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
-                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
+                    <tr><td class="col-desc-input"><input type="text" placeholder="OUTRO"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="2" data-col="2"></td></tr>
                 </tbody>
             </table>
         </div>
@@ -309,24 +284,16 @@
 
         <div><div class="section-header">TRANSFORMAÇÃO</div></div>
         <div class="table-responsive">
-            <table class="border-b">
+            <table>
                 <thead>
-                    <tr>
-                        <th class="col-desc">DESCRIÇÃO</th>
-                        <th class="col-num">Quant 1</th>
-                        <th class="col-num">Valor 1</th>
-                        <th class="col-num">Quant 2</th>
-                        <th class="col-num">Valor 2</th>
-                    </tr>
+                    <tr><th class="col-desc">DESCRIÇÃO</th><th class="col-num">Quant 1</th><th class="col-num">Valor 1</th><th class="col-num">Quant 2</th><th class="col-num">Valor 2</th></tr>
                 </thead>
                 <tbody>
                     <tr><td class="col-desc">ACERTO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
-                    <tr><td class="col-desc">IMPRESSÃO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
-                    <tr><td class="col-desc">IMPRESSÃO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
+                    <tr><td class="col-desc">IMPRESSÃO 1</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
+                    <tr><td class="col-desc">IMPRESSÃO 2</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
                     <tr><td class="col-desc">CORTE E VINCO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
                     <tr><td class="col-desc">ACABAMENTO</td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
-                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
-                    <tr><td class="col-desc-input"><input type="text"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="1"></td><td><input type="text"></td><td><input type="text" class="calc-input" data-table="3" data-col="2"></td></tr>
                 </tbody>
             </table>
         </div>
@@ -339,23 +306,17 @@
         <div class="commercial-section">
             <div class="cond-left">
                 <div class="commercial-title uppercase">CONDIÇÕES COMERCIAIS</div>
-                <div class="cond-item uppercase">
-                    <span>COND.PAGTº:</span>
-                    <input type="text" class="input-line flex-grow">
-                </div>
-                <div class="cond-item uppercase">
-                    <span>IMPOSTOS:</span>
-                    <input type="text" class="input-line flex-grow">
-                </div>
+                <div class="cond-item uppercase"><span>COND.PAGTº:</span><input type="text" class="input-line flex-grow"></div>
+                <div class="cond-item uppercase"><span>IMPOSTOS (%):</span><input type="text" id="porcentagem-imposto" class="input-line flex-grow" placeholder="0"></div>
             </div>
             
             <div class="cond-right">
-                <div class="commercial-title uppercase">PREÇO DE VENDA</div>
+                <div class="commercial-title uppercase">PREÇO DE VENDA (COM IMPOSTOS)</div>
                 <div class="price-line uppercase">
                     <span>1ª :QUANT :</span>
                     <input type="text" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px;">
                     <span>R$</span>
-                    <input type="text" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px;">
+                    <input type="text" id="total-venda-1" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px; font-size: 13px; color: blue; font-weight: bold;">
                     <span style="text-transform: lowercase;">u.</span>
                     <input type="text" class="input-line flex-grow" style="margin-left: 5px; min-width: 30px;">
                 </div>
@@ -363,69 +324,204 @@
                     <span>2ª :QUANT :</span>
                     <input type="text" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px;">
                     <span>R$</span>
-                    <input type="text" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px;">
+                    <input type="text" id="total-venda-2" class="input-line flex-grow" style="margin: 0 5px; min-width: 30px; font-weight: bold;">
                     <span style="text-transform: lowercase;">u.</span>
                     <input type="text" class="input-line flex-grow" style="margin-left: 5px; min-width: 30px;">
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
 <div class="print-controls">
-    <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+    <button class="btn btn-update" onclick="finalizarProcesso('atualizar')">💾 ATUALIZAR ESTE PEDIDO</button>
+    <button class="btn btn-new" onclick="finalizarProcesso('novo')">➕ SALVAR COMO NOVO NÚMERO</button>
+    <button class="btn btn-clear" onclick="limparFormulario()">🧹 LIMPAR FORMULÁRIO</button>
 </div>
 
 <script>
-    // Função para preencher a data atual automaticamente
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2mtPLT6jmofB0-88R_W8OzHD55bP8B-wlwT4ibyOAGIA8Rnf_k5zADDy-uYYYaae5Tw/exec";
+
     function setDateToday() {
         const today = new Date();
-        const dia = String(today.getDate()).padStart(2, '0');
-        const mes = String(today.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
-        const ano = today.getFullYear();
-
-        document.getElementById('data-dia').value = dia;
-        document.getElementById('data-mes').value = mes;
-        document.getElementById('data-ano').value = ano;
+        document.getElementById('data-dia').value = String(today.getDate()).padStart(2, '0');
+        document.getElementById('data-mes').value = String(today.getMonth() + 1).padStart(2, '0');
+        document.getElementById('data-ano').value = today.getFullYear();
     }
+
+    // 1. BUSCAR PEDIDOS CORRIGIDO
+    async function buscarOrcamentos() {
+        const v = document.getElementById('filtro-vendedor').value.toUpperCase();
+        if(!v) return alert("Digite o vendedor!");
+        
+        try {
+            // Adicionado parâmetro action para o Apps Script saber o que fazer
+            const res = await fetch(`${SCRIPT_URL}?action=searchOrders&vendedor=${v}`);
+            const pedidos = await res.json();
+            const lista = document.getElementById('lista-pedidos');
+            
+            if(pedidos.length === 0) {
+                lista.innerHTML = '<div class="pedido-item">Nenhum pedido encontrado.</div>';
+            } else {
+                lista.innerHTML = pedidos.map(p => `
+                    <div class="pedido-item" onclick='carregarPedido(${JSON.stringify(p)})'>
+                        <strong>${p.id}</strong> - ${p.cliente} | ${p.desc} (R$ ${p.total})
+                    </div>
+                `).join('');
+            }
+            lista.style.display = 'block';
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao buscar pedidos. Verifique se o Script URL está correto e aceitando GET.");
+        }
+    }
+
+    function carregarPedido(p) {
+        document.getElementById('id-orcamento').value = p.id;
+        document.getElementById('vendedor').value = p.vendedor;
+        document.getElementById('cliente').value = p.cliente;
+        document.getElementById('descricao').value = p.desc;
+        document.getElementById('total-venda-1').value = p.total;
+        document.getElementById('lista-pedidos').style.display = 'none';
+        alert("Pedido " + p.id + " carregado!");
+    }
+
+    async function finalizarProcesso(tipo) {
+        const idCampo = document.getElementById('id-orcamento');
+        const v = document.getElementById('vendedor').value.toUpperCase();
+
+        if(!v) return alert("Informe o vendedor!");
+
+        if (tipo === 'novo') {
+            const res = await fetch(`${SCRIPT_URL}?action=getNextId&vendedor=${v}`);
+            idCampo.value = await res.text();
+        }
+
+        const dados = {
+            id: idCampo.value,
+            vendedor: v,
+            cliente: document.getElementById('cliente').value,
+            desc: document.getElementById('descricao').value,
+            total: document.getElementById('total-venda-1').value
+        };
+
+        fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify(dados) 
+        }).then(() => {
+            alert("Salvo com sucesso!");
+            window.print();
+        }).catch(() => {
+            alert("Erro ao salvar.");
+        });
+    }
+
+    // Geração automática de ID ao sair do campo Vendedor
+    document.getElementById('vendedor').addEventListener('blur', async function() {
+        const v = this.value.toUpperCase();
+        const idOrc = document.getElementById('id-orcamento');
+        if (v.length >= 2 && !idOrc.value) {
+            idOrc.value = "BUSCANDO...";
+            const res = await fetch(`${SCRIPT_URL}?action=getNextId&vendedor=${v}`);
+            idOrc.value = await res.text();
+        }
+    });
 
     function parseNumber(str) {
         if (!str) return 0;
-        str = str.replace(/[^\d.,]/g, '');
-        str = str.replace(',', '.');
+        str = str.toString().replace(/[^\d.,]/g, '').replace(',', '.');
         let val = parseFloat(str);
         return isNaN(val) ? 0 : val;
     }
 
     function formatNumber(num) {
-        return num.toFixed(2).replace('.', ',');
+        return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    // FUNÇÃO DE CÁLCULO ATUALIZADA COM IMPOSTOS
     function calculateTotals() {
+        let tFinal1 = 0; 
+        let tFinal2 = 0;
+        
+        // Soma os subtotais das tabelas
         for (let t = 1; t <= 3; t++) {
             for (let c = 1; c <= 2; c++) {
                 let sum = 0;
-                let inputs = document.querySelectorAll(`.calc-input[data-table="${t}"][data-col="${c}"]`);
-                
-                inputs.forEach(input => {
+                document.querySelectorAll(`.calc-input[data-table="${t}"][data-col="${c}"]`).forEach(input => {
                     sum += parseNumber(input.value);
                 });
-                
-                let subtotalBox = document.getElementById(`sub${t}-col${c}`);
-                if (subtotalBox) {
-                    subtotalBox.value = sum > 0 ? formatNumber(sum) : '';
-                }
+                let subBox = document.getElementById(`sub${t}-col${c}`);
+                if (subBox) subBox.value = sum > 0 ? formatNumber(sum) : '0,00';
+                if (c === 1) tFinal1 += sum; else tFinal2 += sum;
             }
+        }
+
+        // Pega a porcentagem do imposto
+        const impostoPerc = parseNumber(document.getElementById('porcentagem-imposto').value);
+        
+        // Aplica o imposto: Valor * (1 + porcentagem/100)
+        if (impostoPerc > 0) {
+            tFinal1 = tFinal1 * (1 + (impostoPerc / 100));
+            tFinal2 = tFinal2 * (1 + (impostoPerc / 100));
+        }
+
+        document.getElementById('total-venda-1').value = tFinal1 > 0 ? formatNumber(tFinal1) : '0,00';
+        document.getElementById('total-venda-2').value = tFinal2 > 0 ? formatNumber(tFinal2) : '0,00';
+    }
+    function limparFormulario() {
+        // Pede uma confirmação para evitar que você apague sem querer
+        if(confirm("Tem certeza que deseja limpar tudo para começar um novo pedido?")) {
+            
+            // Seleciona todos os inputs e textareas de dentro da folha e apaga
+            const campos = document.querySelectorAll('.page-a4 input, .page-a4 textarea');
+            campos.forEach(campo => {
+                campo.value = '';
+            });
+            
+            // Restaura a data de hoje que foi apagada no passo anterior
+            setDateToday();
+            
+            // FUNÇÃO DE CÁLCULO ATUALIZADA COM IMPOSTO "POR DENTRO" (GROSS-UP)
+    function calculateTotals() {
+        let tFinal1 = 0; 
+        let tFinal2 = 0;
+        
+        // Soma os subtotais das tabelas
+        for (let t = 1; t <= 3; t++) {
+            for (let c = 1; c <= 2; c++) {
+                let sum = 0;
+                document.querySelectorAll(`.calc-input[data-table="${t}"][data-col="${c}"]`).forEach(input => {
+                    sum += parseNumber(input.value);
+                });
+                let subBox = document.getElementById(`sub${t}-col${c}`);
+                if (subBox) subBox.value = sum > 0 ? formatNumber(sum) : '0,00';
+                if (c === 1) tFinal1 += sum; else tFinal2 += sum;
+            }
+        }
+
+        // Pega a porcentagem do imposto
+        const impostoPerc = parseNumber(document.getElementById('porcentagem-imposto').value);
+        
+        // Aplica o imposto "por dentro" para garantir a margem real
+        // Se colocar 10%, ele divide por 0.9. Assim, ao tirar 10% do final, volta pro custo original.
+        if (impostoPerc > 0 && impostoPerc < 100) {
+            tFinal1 = tFinal1 / (1 - (impostoPerc / 100));
+            tFinal2 = tFinal2 / (1 - (impostoPerc / 100));
+        }
+
+        document.getElementById('total-venda-1').value = tFinal1 > 0 ? formatNumber(tFinal1) : '0,00';
+        document.getElementById('total-venda-2').value = tFinal2 > 0 ? formatNumber(tFinal2) : '0,00';
+    }
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        setDateToday(); // Chama a data automática ao carregar
-        const calcInputs = document.querySelectorAll('.calc-input');
-        calcInputs.forEach(input => {
-            input.addEventListener('input', calculateTotals);
-        });
+        setDateToday();
+        
+        // Adiciona o evento de cálculo em todos os inputs de valor e no campo de imposto
+        document.querySelectorAll('.calc-input').forEach(i => i.addEventListener('input', calculateTotals));
+        document.getElementById('porcentagem-imposto').addEventListener('input', calculateTotals);
     });
 </script>
 
